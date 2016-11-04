@@ -1,0 +1,57 @@
+version: '2'
+
+services:
+  influxdb_data:
+    image: busybox
+    volumes:
+      - ./data/influxdb:/data
+
+
+  influxdb:
+    image: influxdb:1.0.2
+    restart: always
+    volumes_from:
+      - influxdb_data
+    environment:
+      - PRE_CREATE_DB=historian
+    expose:
+      - "8090"
+      - "8099"
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+
+  grafana:
+    build:
+        context: ./grafana/
+        dockerfile: Dockerfile
+        args:
+          - https_proxy
+          - http_proxy
+          - no_proxy
+    restart: always
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    environment:
+      - HTTP_USER=admin
+      - HTTP_PASS=admin
+      - http_proxy
+      - https_proxy
+      - no_proxy
+    ports:
+      - "3000:3000"
+
+  telegraf:
+    depends_on:
+      - influxdb
+    image: telegraf:latest
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    links:
+      - influxdb
+    expose:
+      - "8125"
+      - "8092"
+      - "8094"
