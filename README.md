@@ -1,4 +1,13 @@
-# Influx radiator
+# Grafana Influx radiator
+
+Here be a Influx time series DB with Grafana on top usefull for ad-hock
+information radiation business.
+
+In short:
+ * Spin up the stack.
+ * Start pumping data to Influx
+ * Tune Grafana to your liking
+ * Profit
 
 
 # Install stack on local dev machine
